@@ -1,8 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
-import W3CWebSocket from 'websocket/lib/W3CWebSocket';
+//import W3CWebSocket from 'websocket/lib/W3CWebSocket';
 
-const client = new W3CWebSocket('ws://localhost:3001/ws');
+//const client = new W3CWebSocket('ws://localhost:3001/ws');
 
 function App() {
   return (
