@@ -4,6 +4,7 @@ const ws = require('ws');
 const router = express.Router();
 const app = express();
 const cors = require('cors');
+
 app.use(cors());
 
 const port = process.env.PORT || 4000;
@@ -11,6 +12,17 @@ const port = process.env.PORT || 4000;
 router.get('/', (request, response) => {
     response.send('Welcome to root');
 });
+
+router.get('/start', (request, response) => {
+    response.send("received start");
+});
+router.get('/stop', (request, response) => {
+    response.send("received stop");
+});
+router.get('/finish', (request, response) => {
+    response.send("received finish");
+});
+
 
 const server = createServer(app);
 server.listen(port, () => {
