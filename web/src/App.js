@@ -7,21 +7,28 @@ const SERVER_URL = process.env.SOCKET_URL || 'http://localhost:4000/';
 function App() {
 
   const [client, setClient] = useState(new W3CWebSocket.w3cwebsocket(SOCKET_URL));
-  client.onopen = () => {
-    console.log('Websocket connected');
-    client.send('New client connected');
-  }
-  client.onmessage = (message) => {
-    console.log(message);
-  }
-  client.onerror = function() {
-    console.log('connection error');
-  };
-
+  const [socketID, setSocketID] = useState("");
+  const [counter, setCounter] = useState("");
   const [counterState, setCounterState] = useState("INACTIVE");
 
+  useEffect(() => {
+    client.onopen = (message) => {
+      console.log('Websocket connected');
+    }
+    client.onmessage = (message) => {
+      const parsed = JSON.parse(message.data);
+      if(socketID === ""){
+        let { id } = parsed;
+        setSocketID(id);
+      }
+      setCounter(parsed.counter);
+    }
+    client.onerror = function() {
+      console.log('connection error');
+    };
+  }, []);
   const handleStart = () => {
-    fetch(SERVER_URL+"start")
+    fetch(`${SERVER_URL}start?id=${socketID}`)
       .then(res => res.json())
       .then(
         (result) => {
@@ -48,7 +55,7 @@ function App() {
   };
 
   const handleCancel = () => {
-    fetch(SERVER_URL+"cancel")
+    fetch(SERVER_URL+"finish")
       .then(
         (result) => {
           setCounterState("FINISHED");
@@ -69,7 +76,7 @@ function App() {
         <button className='p-4 m-8 border-gray-700 bg-blue-300 font-bold' onClick={handlePause}>Pause</button>
         <button className='p-4 m-8 border-gray-700 bg-blue-300 font-bold' onClick={handleCancel}>Cancel</button>
       </div>
-      <h4 className='mt-8 text-2xl font-bold'>Current count: </h4>
+      <h4 className='mt-8 text-2xl font-bold'>Current count: {counter}</h4>
     </div>
   );
 }
