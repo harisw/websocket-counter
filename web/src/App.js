@@ -20,7 +20,11 @@ function App() {
       if(socketID === ""){
         setSocketID(id);
       }
-      setCounter(counter);
+      if(counter === "FINISH"){
+        setCounterState("FINISHED");
+      } else {
+        setCounter(counter);
+      }
     }
     client.onerror = function() {
       console.log('connection error');

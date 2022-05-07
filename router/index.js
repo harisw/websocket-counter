@@ -32,24 +32,22 @@ frontServer.on('connection', socket => {
 
 const businessServer = new WebSocketServer({ noServer: true});
 businessServer.on('connection', socket => {
-    console.log("Businessocket established");
+    console.log("Business socket established");
     socket.on('message', message => {
         console.log(message.toString());
-        // if(message == 6)
-        //     socket.send("Nice 6");
         try {
             const {id, counter} = JSON.parse(message.toString());
             if(counter == 0){
                 clients[id]['business'] = socket;
             } else if(counter === "FINISH"){
-                clients[id]['status'] = "FINISH";
+                clients[id]['status'] = "FINISHED";
             } else {
                 clients[id]['front'].send(JSON.stringify({
                     'counter': counter
                 }));
             }   
         } catch (err) {
-            
+            console.log(err);
         }
     });
     socket.on('close', () => console.log("business closed"));
@@ -105,7 +103,6 @@ router.get('/start', (request, response) => {
 });
 router.get('/stop', (request, response) => {
     const id = request.query.id;
-    console.log(id);
     if(!clients[id]['status'] === "FINISHED"){
         response.send({
             "status": "ERROR",
@@ -113,6 +110,7 @@ router.get('/stop', (request, response) => {
         });
     } else {
         clients[id]['business'].send("STOP");
+        clients[id]['status'] = "PAUSED";
         response.send({
             "status": "PAUSE",
             "message": "Counter has been paused"
@@ -123,7 +121,6 @@ router.get('/finish', (request, response) => {
     const id = request.query.id;
     try {
         if(clients[id]['status'] !== "FINISHED"){
-            console.log("SENDING finish");
             clients[id]['business'].send("FINISH");
         }
         response.send({

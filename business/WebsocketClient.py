@@ -2,7 +2,7 @@ import websockets
 import asyncio
 from websockets import client
 
-LIMIT = 5
+LIMIT = 100
 DELAY = 1 #computation delay in seconds
 class WebSocketClient():
     def __init__(self, id):
@@ -13,8 +13,6 @@ class WebSocketClient():
     async def connect(self, server_url):
         self.connection = await client.connect(server_url)
         if self.connection.open:
-            print("Connection established")
-            await self.sendMessage("This is websocket client")
             await self.connection.send('{"id": "'+self.id+'", "counter": 0}')
 
             return self.connection
@@ -35,8 +33,6 @@ class WebSocketClient():
                 elif msg == "FINISH":
                     self.finished = True
                     break
-                print('Received message '+ str(msg), flush=True)
-
             except websockets.exceptions.ConnectionClosed:
                 print('Connection with server closed')
                 break
@@ -52,8 +48,9 @@ class WebSocketClient():
                     total += i
                     i += 1
                     await conn.send('{"id": "'+self.id+'", "counter": '+str(total)+'}')
-                    await asyncio.sleep(DELAY)
+                await asyncio.sleep(DELAY)
             except websockets.exceptions.ConnectionClosed:
                 print('Connection closed')
                 break
+        await conn.send('{"id": "'+self.id+'", "counter": "FINISH"}')
         self.finished = True
