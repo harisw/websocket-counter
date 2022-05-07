@@ -10,7 +10,6 @@ const { nanoid } = require('nanoid');
 const { spawn} = require('child_process');
 app.use(cors());
 
-
 var clients = {};
 const port = process.env.PORT || 4000;
 const server = createServer(app);

@@ -16,22 +16,22 @@ function App() {
       console.log('Websocket connected');
     }
     client.onmessage = (message) => {
-      const parsed = JSON.parse(message.data);
+      const {id,counter} = JSON.parse(message.data);
       if(socketID === ""){
-        let { id } = parsed;
         setSocketID(id);
       }
-      setCounter(parsed.counter);
+      setCounter(counter);
     }
     client.onerror = function() {
       console.log('connection error');
     };
-  }, []);
+  }, [client, socketID]);
   const handleStart = () => {
     fetch(`${SERVER_URL}start?id=${socketID}`)
       .then(res => res.json())
       .then(
         (result) => {
+          console.log(result);
           setCounterState("STARTED");
         },
         (error) => {
@@ -42,7 +42,7 @@ function App() {
   };
 
   const handlePause = () => {
-    fetch(SERVER_URL+"stop")
+    fetch(`${SERVER_URL}stop?id=${socketID}`)
       .then(
         (result) => {
           setCounterState("PAUSED");
@@ -55,7 +55,7 @@ function App() {
   };
 
   const handleCancel = () => {
-    fetch(SERVER_URL+"finish")
+    fetch(`${SERVER_URL}finish?id=${socketID}`)
       .then(
         (result) => {
           setCounterState("FINISHED");
