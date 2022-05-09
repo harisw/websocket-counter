@@ -5,7 +5,6 @@ const router = express.Router();
 const app = express();
 const cors = require('cors');
 const { parse } = require('url');
-const {PythonShell} = require('python-shell');
 const { nanoid } = require('nanoid');
 const { spawn} = require('child_process');
 app.use(cors());
@@ -14,15 +13,14 @@ var clients = {};
 const port = process.env.PORT || 4000;
 const server = createServer(app);
 
-const frontServer = new WebSocketServer({ noServer: true});
 
+const frontServer = new WebSocketServer({ noServer: true});
 frontServer.on('connection', socket => {
     const newID = nanoid();
     clients[newID] = {
         'front': socket,
         'status': "IDLE"
     };
-
     socket.send(JSON.stringify({
         'id': newID
     }));
@@ -75,7 +73,6 @@ router.get('/', (request, response) => {
     response.send({'msg': 'Welcome to root'});
 });
 router.get('/start', (request, response) => {
-    
     const id = request.query.id;
     try {
         if(clients[id]['status'] === "IDLE" || clients[id]['status'] === "FINISHED"){
@@ -137,7 +134,6 @@ router.get('/finish', (request, response) => {
 });
 
 app.use('/', router);
-
 server.listen(port, () => {
     console.log(`Server running on ${port}`);
 })
